@@ -3,7 +3,6 @@ import { styled } from "linaria/react";
 import { Link } from "gatsby";
 
 const Container = styled.div`
-	/* background-color: red; */
 	margin: 32px 64px;
 	position: absolute;
 	height: 60px;
@@ -16,10 +15,7 @@ const Container = styled.div`
 	a {
 		text-decoration: none;
 		cursor: pointer;
-
-		&:visited {
-			color: unset;
-		}
+		color: inherit;
 	}
 	span {
 		font-family: Mulish;

@@ -1,41 +1,54 @@
 import * as React from "react";
 import { styled } from "linaria/react";
 
-const { useState, useLayoutEffect, useEffect } = React;
+const { useState, useRef, useEffect } = React;
 
 const Container = styled.div`
 	position: relative;
-	display: inline-block;
-	overflow: hidden;
-	margin: 0;
 	height: 100%;
 	width: 100%;
 
-	img {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
+	.pixelated {
+		image-rendering: pixelated;
 	}
 `;
 
-const ThumbnailHero = styled.img`
-	image-rendering: pixelated;
-	/* transition: visibility 0ms ease 400ms; */
-	/* filter: blur(20px); */
+const WhiteText = styled.div`
+	color: #fff;
+	font-size: 18px;
+	font-weight: bold;
+	text-transform: uppercase;
 `;
 
-const FullHero = styled.img`
-	/* transition: opacity 400ms ease 0ms; */
+const ImageContent = styled.div`
+	margin: 32px 64px;
+	position: absolute;
+	display: flex;
+
+	div {
+		margin-left: 16px;
+	}
+
+	${WhiteText}:first-child {
+		margin-bottom: 8px;
+		font-size: 22px;
+	}
 `;
 
 const Square = styled.div`
 	cursor: pointer;
-	margin: 32px 64px;
 	height: 60px;
 	width: 60px;
-	position: absolute;
 	border: 10px solid #ffffff;
+`;
+
+const ImageDiv = styled.div`
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-position: center;
+	background-size: cover;
+	background-repeat: no-repeat;
 `;
 
 interface IHero {
@@ -47,19 +60,16 @@ const images = [
 	{
 		low: "/image_1_low.jpg",
 		high: "/image_1_high.jpg",
-		style: { height: "100%" },
 		content: { title: "Iceland", description: "Sometime in 2019" },
 	},
 	{
 		low: "/image_2_low.jpg",
 		high: "/image_2_high.jpg",
-		style: { width: "100%" },
 		content: { title: "China", description: "Yellow mountains" },
 	},
 	{
 		low: "/image_3_low.jpg",
 		high: "/image_3_high.jpg",
-		style: { width: "100%" },
 		content: { title: "China", description: "Month before pandemic" },
 	},
 ];
@@ -67,41 +77,75 @@ const images = [
 const random = (max: number): number => Math.floor(Math.random() * Math.floor(max));
 
 const Carousel = (): JSX.Element => {
+	const highResRef = useRef<HTMLDivElement>(null);
 	const [isLoaded, setIsLoaded] = useState<boolean>(false);
 	const [curIndex, setCurIndex] = useState<number>(random(images.length));
+
+	// TODO
+	// Prelaod all low res images, this way it will avoid showing blank page for a moment.
 
 	const goToNext = (images: IHero[], curIndex: number) => {
 		const next = (array: IHero[], index: number): number => {
 			const next = index + 1;
 			return next > array.length - 1 ? 0 : next;
 		};
-		setIsLoaded(false);
+
 		setCurIndex(next(images, curIndex));
 	};
 
 	useEffect(() => {
-		const timer = setInterval(() => goToNext(images, curIndex), 60000);
+		const timer = setInterval(() => goToNext(images, curIndex), 30000);
 
 		return () => clearInterval(timer);
 	}, [curIndex]);
 
-	// const handleClick = () => {
-	// 	goToNext(images, curIndex);
-	// };
+	useEffect(() => {
+		const el = highResRef.current;
+		if (!el) return;
+		setIsLoaded(false);
+		const listener = () => {
+			setTimeout(() => {
+				el.style.backgroundImage = `url(${images[curIndex].high})`;
+				setIsLoaded(true);
+			}, 700);
+		};
+		const image = new Image();
+		image.src = images[curIndex].high;
+		image.addEventListener("load", listener);
+		return () => {
+			image.removeEventListener("load", listener);
+		};
+	}, [highResRef, curIndex]);
+
+	const handleClick = () => {
+		goToNext(images, curIndex);
+	};
+
+	const {
+		content: { title, description },
+	} = images[curIndex];
 
 	return (
 		<Container>
-			<ThumbnailHero
-				src={images[curIndex].low}
-				style={{ visibility: isLoaded ? "hidden" : "visible", ...images[curIndex].style }}
+			<ImageDiv
+				ref={highResRef}
+				style={{ opacity: isLoaded ? 1 : 0 }}
+				onClick={handleClick}
+				className="pixelated"
 			/>
-			<FullHero
-				// onClick={handleClick}
-				onLoad={() => setTimeout(() => setIsLoaded(true), 500)}
-				style={{ opacity: isLoaded ? 1 : 0, ...images[curIndex].style }}
-				src={images[curIndex].high}
+			<ImageDiv
+				style={{
+					backgroundImage: `url("${images[curIndex].low}")`,
+					visibility: isLoaded ? "hidden" : "visible",
+				}}
 			/>
-			<Square />
+			<ImageContent>
+				<Square />
+				<div>
+					<WhiteText>{title}</WhiteText>
+					<WhiteText>{description}</WhiteText>
+				</div>
+			</ImageContent>
 		</Container>
 	);
 };
