@@ -8,6 +8,19 @@ const Container = styled.div`
 	margin-left: 64px;
 `;
 
+const SlideInText = styled.div`
+	animation: 1s text-transition forwards;
+	opacity: 0;
+	transform: translateX(100%);
+
+	@keyframes text-transition {
+		to {
+			transform: translateX(0);
+			opacity: 1;
+		}
+	}
+`;
+
 const content = {
 	title:
 		"I’m a Front End Developer based in\nSan Francisco, working on productive tools and stuff like that...",
@@ -20,9 +33,9 @@ const About = (): JSX.Element => {
 	return (
 		<Container>
 			<div>
-				<div className="content-heading">{content.title}</div>
-				<div className="entry-blurb first-blurb">{content.blurb_1}</div>
-				<div className="entry-blurb">{content.blurb_2}</div>
+				<SlideInText className="content-heading">{content.title}</SlideInText>
+				<SlideInText className="entry-blurb first-blurb">{content.blurb_1}</SlideInText>
+				<SlideInText className="entry-blurb">{content.blurb_2}</SlideInText>
 			</div>
 		</Container>
 	);

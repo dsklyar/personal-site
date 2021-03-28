@@ -1,6 +1,7 @@
 import * as React from "react";
 import { styled } from "linaria/react";
 import { Link } from "gatsby";
+import { cx } from "linaria";
 
 const Container = styled.div`
 	margin: 32px 64px;
@@ -21,9 +22,19 @@ const Container = styled.div`
 		font-family: Mulish;
 		text-transform: uppercase;
 		font-style: normal;
-		font-weight: normal;
 		font-size: 18px;
 		line-height: 23px;
+		padding-bottom: 8px;
+		border-bottom: 2px solid transparent;
+		position: relative;
+
+		:hover {
+			border-bottom: 2px solid #333;
+		}
+	}
+
+	.active {
+		border-bottom: 2px solid #c4c4c4;
 	}
 `;
 
@@ -39,7 +50,14 @@ const LeftSide = styled.div`
 	}
 `;
 
-const Navbar = (): JSX.Element => {
+interface IProps {
+	pathanme: string;
+}
+
+const Navbar = (props: IProps): JSX.Element => {
+	const { pathanme } = props;
+
+	const generateLinkClass = (path: string) => (path === pathanme ? "active" : "");
 	return (
 		<Container>
 			<LeftSide>
@@ -53,7 +71,7 @@ const Navbar = (): JSX.Element => {
 			</LeftSide>
 			<RightSide>
 				<Link to="/">
-					<span>Home</span>
+					<span className={generateLinkClass("/")}>Home</span>
 				</Link>
 				<Link to="/work">
 					<span>Work</span>

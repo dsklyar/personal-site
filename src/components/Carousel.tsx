@@ -1,6 +1,8 @@
 import * as React from "react";
 import { styled } from "linaria/react";
 
+// import ImageCounter from "./../components/ImageSelector";
+
 const { useState, useRef, useEffect } = React;
 
 const Container = styled.div`
@@ -15,6 +17,7 @@ const Container = styled.div`
 
 const WhiteText = styled.div`
 	color: #fff;
+	cursor: default;
 	font-size: 18px;
 	font-weight: bold;
 	text-transform: uppercase;
@@ -33,6 +36,24 @@ const ImageContent = styled.div`
 		margin-bottom: 8px;
 		font-size: 22px;
 	}
+
+	.text-animation {
+		animation-delay: 1s;
+		animation: text-transition 1s;
+		animation-fill-mode: forwards;
+	}
+	.text-hidden {
+		visibility: hidden;
+	}
+
+	@keyframes text-transition {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
 `;
 
 const Square = styled.div`
@@ -44,6 +65,7 @@ const Square = styled.div`
 
 const ImageDiv = styled.div`
 	position: absolute;
+	cursor: pointer;
 	width: 100%;
 	height: 100%;
 	background-position: center;
@@ -76,15 +98,18 @@ const images = [
 
 const random = (max: number): number => Math.floor(Math.random() * Math.floor(max));
 
-const Carousel = (): JSX.Element => {
+const Carousel = (): JSX.Element | null => {
 	const highResRef = useRef<HTMLDivElement>(null);
-	const [isLoaded, setIsLoaded] = useState<boolean>(false);
+	const [isHighresLoaded, setHighresLoaded] = useState<boolean>(false);
 	const [curIndex, setCurIndex] = useState<number>(random(images.length));
 
 	// TODO
 	// Prelaod all low res images, this way it will avoid showing blank page for a moment.
 
-	const goToNext = (images: IHero[], curIndex: number) => {
+	// TODO
+	// Scale square to match smaller resolution
+
+	const goToNext = (images: IHero[], curIndex: number): void => {
 		const next = (array: IHero[], index: number): number => {
 			const next = index + 1;
 			return next > array.length - 1 ? 0 : next;
@@ -102,23 +127,23 @@ const Carousel = (): JSX.Element => {
 	useEffect(() => {
 		const el = highResRef.current;
 		if (!el) return;
-		setIsLoaded(false);
+		setHighresLoaded(false);
 		const listener = () => {
 			setTimeout(() => {
 				el.style.backgroundImage = `url(${images[curIndex].high})`;
-				setIsLoaded(true);
+				setHighresLoaded(true);
 			}, 700);
 		};
 		const image = new Image();
 		image.src = images[curIndex].high;
 		image.addEventListener("load", listener);
-		return () => {
-			image.removeEventListener("load", listener);
-		};
+		return () => image.removeEventListener("load", listener);
 	}, [highResRef, curIndex]);
 
 	const handleClick = () => {
-		goToNext(images, curIndex);
+		if (isHighresLoaded) {
+			goToNext(images, curIndex);
+		}
 	};
 
 	const {
@@ -129,23 +154,28 @@ const Carousel = (): JSX.Element => {
 		<Container>
 			<ImageDiv
 				ref={highResRef}
-				style={{ opacity: isLoaded ? 1 : 0 }}
+				style={{ opacity: isHighresLoaded ? 1 : 0 }}
 				onClick={handleClick}
-				className="pixelated"
 			/>
 			<ImageDiv
+				className="pixelated"
 				style={{
 					backgroundImage: `url("${images[curIndex].low}")`,
-					visibility: isLoaded ? "hidden" : "visible",
+					visibility: isHighresLoaded ? "hidden" : "visible",
 				}}
 			/>
 			<ImageContent>
 				<Square />
-				<div>
+				<div className={isHighresLoaded ? "text-animation" : "text-hidden"}>
 					<WhiteText>{title}</WhiteText>
 					<WhiteText>{description}</WhiteText>
 				</div>
 			</ImageContent>
+			{/* <ImageCounter
+				current={curIndex}
+				total={images.length}
+				onChange={(index: number) => console.log(index)}
+			/> */}
 		</Container>
 	);
 };

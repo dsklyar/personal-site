@@ -19,7 +19,7 @@ export const globals = css`
 
 		.content-heading {
 			font-size: 32px;
-			width: 578px;
+			max-width: 578px;
 		}
 
 		.entry-blurb {

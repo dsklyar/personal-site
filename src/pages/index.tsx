@@ -16,6 +16,10 @@ const Main = styled.main`
 const Layout = styled.div`
 	display: flex;
 	flex: 1;
+
+	@media (max-device-width: 640px) {
+		flex-direction: column;
+	}
 `;
 
 const SideSection = styled.div`
@@ -27,8 +31,15 @@ const Content = styled.div`
 	position: relative;
 `;
 
-// markup
-const IndexPage = (): JSX.Element => {
+interface IProps {
+	location: { pathname: string };
+}
+
+const IndexPage = (props: IProps): JSX.Element => {
+	const {
+		location: { pathname },
+	} = props;
+
 	return (
 		<Main className={globals}>
 			<title>Home Page</title>
@@ -37,7 +48,7 @@ const IndexPage = (): JSX.Element => {
 					<Carousel />
 				</SideSection>
 				<Content>
-					<Navbar />
+					<Navbar pathanme={pathname} />
 					<About />
 				</Content>
 			</Layout>
