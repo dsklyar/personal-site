@@ -5,7 +5,7 @@ const Container = styled.div`
 	height: 100%;
 	display: flex;
 	align-items: center;
-	margin-left: 64px;
+	margin-left: 4rem;
 `;
 
 const SlideInText = styled.div`
@@ -34,7 +34,7 @@ const About = (): JSX.Element => {
 		<Container>
 			<div>
 				<SlideInText className="content-heading">{content.title}</SlideInText>
-				<SlideInText className="entry-blurb first-blurb">{content.blurb_1}</SlideInText>
+				<SlideInText className="entry-blurb">{content.blurb_1}</SlideInText>
 				<SlideInText className="entry-blurb">{content.blurb_2}</SlideInText>
 			</div>
 		</Container>

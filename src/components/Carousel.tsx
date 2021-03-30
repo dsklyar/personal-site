@@ -18,23 +18,28 @@ const Container = styled.div`
 const WhiteText = styled.div`
 	color: #fff;
 	cursor: default;
-	font-size: 18px;
+	font-size: 1rem;
 	font-weight: bold;
 	text-transform: uppercase;
 `;
 
+const Square = styled.div`
+	cursor: pointer;
+	height: 3rem;
+	width: 3rem;
+	border: 0.5rem solid #ffffff;
+`;
+
 const ImageContent = styled.div`
-	margin: 32px 64px;
+	margin: 2rem 4rem;
 	position: absolute;
 	display: flex;
 
-	div {
-		margin-left: 16px;
-	}
-
-	${WhiteText}:first-child {
-		margin-bottom: 8px;
-		font-size: 22px;
+	div:not(${Square}) {
+		margin-left: 1rem;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
 	}
 
 	.text-animation {
@@ -54,13 +59,6 @@ const ImageContent = styled.div`
 			opacity: 1;
 		}
 	}
-`;
-
-const Square = styled.div`
-	cursor: pointer;
-	height: 60px;
-	width: 60px;
-	border: 10px solid #ffffff;
 `;
 
 const ImageDiv = styled.div`

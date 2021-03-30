@@ -1,13 +1,14 @@
 import * as React from "react";
 import { styled } from "linaria/react";
 import { Link } from "gatsby";
-import { cx } from "linaria";
+import { useHover } from "../hooks/useHover";
+import { Arrow } from "./Arrow";
 
 const Container = styled.div`
-	margin: 32px 64px;
+	margin: 2rem 4rem;
 	position: absolute;
 	height: 60px;
-	width: calc(100% - 64px * 2);
+	width: calc(100% - 4rem * 2);
 	display: flex;
 	flex-direction: row;
 	align-items: center;
@@ -22,25 +23,42 @@ const Container = styled.div`
 		font-family: Mulish;
 		text-transform: uppercase;
 		font-style: normal;
-		font-size: 18px;
-		line-height: 23px;
+		font-size: 1rem;
+		line-height: 1.5rem;
 		padding-bottom: 8px;
-		border-bottom: 2px solid transparent;
-		position: relative;
-
-		:hover {
-			border-bottom: 2px solid #333;
-		}
 	}
 
-	.active {
-		border-bottom: 2px solid #c4c4c4;
+	.active:not(:hover) {
+		svg {
+			visibility: visible;
+		}
+	}
+`;
+
+const LinkWrapper = styled.div`
+	position: relative;
+
+	svg {
+		pointer-events: none;
+		visibility: hidden;
+		position: absolute;
+		position: absolute;
+		margin-top: 2rem;
+		left: 50%;
+	}
+
+	&:hover svg {
+		visibility: visible;
+		path {
+			stroke: black;
+		}
 	}
 `;
 
 const RightSide = styled.div`
+	display: flex;
 	span {
-		margin-left: 24px;
+		margin-left: 1.5rem;
 	}
 `;
 
@@ -56,8 +74,25 @@ interface IProps {
 
 const Navbar = (props: IProps): JSX.Element => {
 	const { pathanme } = props;
+	const [ref, isHovered] = useHover<HTMLDivElement>();
 
-	const generateLinkClass = (path: string) => (path === pathanme ? "active" : "");
+	const generateLinks = () => {
+		const isSelected = (path: string) => path === pathanme && !isHovered;
+		const links = [
+			{ path: "/", name: "Home" },
+			{ path: "/work", name: "Work" },
+			{ path: "/about", name: "About" },
+		];
+		return links.map(({ path, name }, i) => (
+			<Link to={path} key={i}>
+				<LinkWrapper className={`${isSelected(path) ? "active" : ""}`}>
+					<span>{name}</span>
+					{Arrow}
+				</LinkWrapper>
+			</Link>
+		));
+	};
+
 	return (
 		<Container>
 			<LeftSide>
@@ -69,17 +104,7 @@ const Navbar = (props: IProps): JSX.Element => {
 					<span>Daniel Sklyar</span>
 				</a>
 			</LeftSide>
-			<RightSide>
-				<Link to="/">
-					<span className={generateLinkClass("/")}>Home</span>
-				</Link>
-				<Link to="/work">
-					<span>Work</span>
-				</Link>
-				<Link to="/about">
-					<span>About</span>
-				</Link>
-			</RightSide>
+			<RightSide ref={ref}>{generateLinks()}</RightSide>
 		</Container>
 	);
 };
